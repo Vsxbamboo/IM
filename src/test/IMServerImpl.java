@@ -1,11 +1,14 @@
 package test;
 
-import java.util.*;
+import javax.swing.ImageIcon;
+import java.awt.Image;
 import javax.jws.*;
 
 @WebService(endpointInterface="test.IMServer")
+
 public class IMServerImpl implements IMServer{
-	
+	public static Image imageBufferred=new ImageIcon("icon.png").getImage();
+	@Override
 	public void addMsg(String msg) {
 		try {
 		IOProcess.writeFile(msg);
@@ -13,6 +16,7 @@ public class IMServerImpl implements IMServer{
 			System.out.println("Error,IMServerImpl addMsg iop.output");
 		}
 	}
+	@Override
 	public byte[] getMsg() {
 		try {
 			return IOProcess.readFile().getBytes("UTF-8");
@@ -21,8 +25,12 @@ public class IMServerImpl implements IMServer{
 		}
 		return new byte[]{1,2};
 	}
-	public String getTime(){
-		Date now=new Date();
-		return now.toString();
+	@Override
+	public void addImage(Image icon) {
+		imageBufferred=icon;
+	}
+	@Override
+	public Image getImage() {
+		return imageBufferred;
 	}
 }

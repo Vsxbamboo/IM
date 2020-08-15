@@ -1,5 +1,6 @@
 package test;
 
+import java.awt.Image;
 import java.net.*;
 import javax.xml.namespace.*;
 import javax.xml.ws.*;
@@ -23,5 +24,17 @@ public class PostAndGet {
 		Service service=Service.create(url,qname);
 		IMServer srs=service.getPort(IMServer.class);
 		srs.addMsg(msg);
+	}
+	public static void postImage(Image icon) throws Exception {
+		URL url=new URL("http://127.0.0.1:5335/service?wsdl");
+		Service service=Service.create(url,qname);
+		IMServer srs=service.getPort(IMServer.class);
+		srs.addImage(icon);
+	}
+	public static Image getImage() throws Exception {
+		URL url=new URL("http://127.0.0.1:5335/service?wsdl");
+		Service service=Service.create(url,qname);
+		IMServer srs=service.getPort(IMServer.class);
+		return srs.getImage();
 	}
 }
