@@ -1,6 +1,6 @@
 package test;
 
-import java.awt.Image;
+import java.math.BigInteger;
 import javax.jws.*;
 import javax.jws.soap.*;
 import javax.jws.soap.SOAPBinding.*;
@@ -9,8 +9,7 @@ import javax.jws.soap.SOAPBinding.*;
 @SOAPBinding(style=Style.RPC)
 
 public interface IMServer {
-	@WebMethod public void addMsg(String msg);
-	@WebMethod public byte[] getMsg();
-	@WebMethod public void addImage(Image icon);
-	@WebMethod public Image getImage();
+	@WebMethod public boolean postMsg(Message msg);
+	@WebMethod public Message getMsg(int count,BigInteger postid);
+	@WebMethod public BigInteger[] getPubckey(String nick,BigInteger[] mypubkey);
 }
