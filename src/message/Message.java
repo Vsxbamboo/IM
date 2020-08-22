@@ -1,4 +1,4 @@
-package test;
+package message;
 
 import java.awt.Image;
 import java.math.BigInteger;
@@ -14,11 +14,15 @@ public class Message {
 	public Message() {
 		this.type=-1;
 	}
-	public Message(String nick,BigInteger mid,String text){
+	public Message(String nick,String text){
 		this.nick=nick;
-		this.mid=mid;
 		this.type=1;
 		this.text=text;
+	}
+	public Message(String nick,Image pic){
+		this.nick=nick;
+		this.type=2;
+		this.pic=pic;
 	}
 	public Message(String nick,BigInteger mid,BigInteger[] etext){
 		this.nick=nick;

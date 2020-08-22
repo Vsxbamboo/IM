@@ -1,14 +1,17 @@
-package test;
+package client;
 
 import java.math.BigInteger;
 import java.net.*;
 import javax.xml.namespace.*;
 import javax.xml.ws.*;
 
+import message.Message;
+import server.IMServer;
+
 public class PostAndGet {
 	public static Message getMsg(int count,BigInteger postid) throws Exception {
 		QName qname=new QName(
-				"http://test/",
+				"http://server/",
 				"IMServerImplService"
 				);
 		URL url=new URL("http://127.0.0.1:5335/service?wsdl");
@@ -20,7 +23,7 @@ public class PostAndGet {
 	public static boolean postMsg(Message msg) throws Exception {
 		
 		QName qname=new QName(
-				"http://test/",
+				"http://server/",
 				"IMServerImplService"
 				);
 		URL url=new URL("http://127.0.0.1:5335/service?wsdl");
@@ -30,7 +33,7 @@ public class PostAndGet {
 	}
 	public static BigInteger[] getPubkey(String nick,BigInteger[] mypubkey) throws Exception {
 		QName qname=new QName(
-				"http://test/",
+				"http://server/",
 				"IMServerImplService"
 				);
 		URL url=new URL("http://127.0.0.1:5335/service?wsdl");

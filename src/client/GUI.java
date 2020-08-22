@@ -1,4 +1,4 @@
-package test;
+package client;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -12,12 +12,14 @@ public class GUI extends JFrame{
 	public JEmoji Emoji;//emoji窗口
 	public JPanel msgBox=new JPanel();//消息框
 	public JScrollPane mBS=new JScrollPane(msgBox);//消息框的外部滚动框
+	public JScrollBar mBSB=mBS.getVerticalScrollBar();
 	public JLabel nicktip=new JLabel("your nick:");//nick左边的标签
 	public JTextField nick=new JTextField(6);//nick文本框
 	public JButton nickconfirm=new JButton("confirm");//confirm按钮
 	public JPanel leftPanel=new JPanel();//左侧面板
-	public JPanel nickPanel=new JPanel();//nick三个组件所在面板
-	public JTextField sendBox=new JTextField(20);//发送文本框
+	public JPanel nickPanel=new JPanel();//nick三个组件所在面板	
+	public JTextArea sendBox=new JTextArea(10,20);//发送文本框
+	public JScrollPane sBS=new JScrollPane(sendBox);
 	public JButton send=new JButton("send");//三个按钮
 	public JButton post=new JButton("post");
 	public JButton emoji=new JButton("emoji");
@@ -30,6 +32,7 @@ public class GUI extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new GridLayout(1,2));
 		msgBox.setLayout(new BoxLayout(msgBox,BoxLayout.Y_AXIS));//消息竖直布局
+		msgBox.setAlignmentX(0);//TODO
 		leftPanel.setLayout(new BorderLayout());
 		leftPanel.add(mBS,BorderLayout.CENTER);
 		nickPanel.add(nicktip);
@@ -37,8 +40,9 @@ public class GUI extends JFrame{
 		nickPanel.add(nickconfirm);
 		leftPanel.add(nickPanel,BorderLayout.SOUTH);
 		add(leftPanel);
+		sendBox.setLineWrap(true);
 		sendBox.setEnabled(false);
-		sendPanel.add(sendBox);
+		sendPanel.add(sBS);
 		send.setEnabled(false);
 		sendPanel.add(send);
 		post.setEnabled(false);

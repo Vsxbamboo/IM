@@ -1,15 +1,17 @@
-package test;
+package client;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigInteger;
 import javax.swing.*;
 import encryption.*;
+import message.Message;
 
 
 public class Main implements MouseListener,KeyListener,Runnable{
 	int count=0;//总消息数
-	boolean ready=false;
+	boolean ready=false;//是否选择了昵称
+	boolean ctrl=false;//是否按了ctrl
 	BigInteger id,originid;//原始id，以及变化id，每次一发送消息后都会对id进行修改改
 	BigInteger[] pubkey=new BigInteger[3];//接受服务器返回的公钥数组，0是n，1是公钥，2是原始id
 	BigInteger[] mypubkey=new BigInteger[2];//记载自己产生的公钥数组，0是n，1是公钥
@@ -18,7 +20,7 @@ public class Main implements MouseListener,KeyListener,Runnable{
 	public static Thread refresh;//消息刷新线程 
 	public Main() throws Exception{
 		encryption=new Encryption();//初始化，产生自己的公私钥
-		//将公私钥导入mypubkeyy
+		//将公私钥导入mypubkey
 		mypubkey[0]=encryption.n;
 		mypubkey[1]=encryption.e;
 		gui=new GUI();//图形用户界面初始化
@@ -58,8 +60,6 @@ public class Main implements MouseListener,KeyListener,Runnable{
 				} else {
 					//发送失败，显示在sendBox
 					gui.sendBox.setText("fail to send msg");
-					Thread.sleep(1000);
-					gui.sendBox.setText("");
 				}
 			
 		} catch (Exception exc) {
@@ -72,15 +72,6 @@ public class Main implements MouseListener,KeyListener,Runnable{
 		} else {
 			//空的sendBox,不处理的话会出现空指针nullPointer
 			gui.sendBox.setText("nullmsg");
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e1) {
-				System.out.println(
-						"unable to Thread.sleep when sendBox is null"
-						);
-			}
-			gui.sendBox.setText("");
-			
 		}
 	}
 	//发送图片方法
@@ -99,8 +90,7 @@ public class Main implements MouseListener,KeyListener,Runnable{
 			} else {
 				//发送失败
 				gui.sendBox.setText("fail to send msg");
-				Thread.sleep(1000);
-				gui.sendBox.setText("");
+				
 			}
 		} catch (Exception exc) {
 			//PostAndGet.postMsg报错
@@ -126,26 +116,30 @@ public class Main implements MouseListener,KeyListener,Runnable{
 				Message msg = PostAndGet.getMsg(count,postid);
 				if (msg.type!=-1) {//空消息的type为-1
 					gui.setTitle("IM loading");//窗口标题提示加载中
-					JPanel dialog = new JPanel(new FlowLayout());//显示消息的JPanel对象
-					dialog.setLayout(new BoxLayout(dialog,BoxLayout.X_AXIS));//水平布局管理器，昵称在左，消息在右
+					JPanel dialog = new JPanel(new GridLayout(2,1));//显示消息的JPanel对象,盒式布局
+					dialog.setAlignmentY(0);
 					JLabel nick = new JLabel (msg.nick+":");//用于nick显示的标签
 					if (msg.type==1) {//消息类型1，文本消息
-						//显示文本消息的标签，先要解密
-						JLabel text = new JLabel (Transform.decryptText(msg.etext, id));
-						//添加nick标签，设置上面的dialog容器为左对齐的流式布局管理器，防止消息居中显示
-						dialog.add(nick,FlowLayout.LEFT);
-						//添加text标签
-						dialog.add(text);
-						//设置左边间隔为零，强行左对齐，上面的不起作用
-						dialog.setAlignmentX(0);
-						gui.msgBox.add(dialog);//把消息加到消息框中
+						//显示文本消息的文本区域，先要解密
+						JTextArea text = new JTextArea (Transform.decryptText(msg.etext, id));
+						text.setLineWrap(true);//自动换行
+						text.setEditable(false);//不可编辑
+						nick.setMaximumSize(nick.getPreferredSize());
+						text.setMaximumSize(text.getPreferredSize());
+						nick.setAlignmentX(0);
+						text.setAlignmentX(0);
+						gui.msgBox.add(nick);
+						gui.msgBox.add(text);
 						needRevalidate=true;//需要刷新消息框
 						count++;//消息数加一
 					} else if (msg.type==2) {//图片消息type=2
 						JLabel pic = new JLabel (
-								new ImageIcon (msg.pic)
-								);//用新标签对象装图片
-						//分别添加，以免布局出现消息居中状况
+								new ImageIcon (msg.pic),JLabel.LEFT
+								);//用新标签对象装图片,并且设置左对齐
+						nick.setMaximumSize(nick.getPreferredSize());
+						pic.setMaximumSize(pic.getPreferredSize());
+						nick.setAlignmentX(0);
+						pic.setAlignmentX(0);
 						gui.msgBox.add(nick);
 						gui.msgBox.add(pic);
 						needRevalidate=true;//需要刷新消息框
@@ -154,7 +148,10 @@ public class Main implements MouseListener,KeyListener,Runnable{
 				} else {
 					//是否要刷新消息框
 					if (needRevalidate) {//当收到空消息时表示已经没有新消息了
+						
 						gui.msgBox.revalidate();
+						gui.mBSB.setValue(gui.mBSB.getMaximum());
+						needRevalidate=false;
 					}
 					//这里是初始化的时候会加载一次消息，加载后才允许发消息
 					gui.sendBox.setEnabled(true);
@@ -183,38 +180,25 @@ public class Main implements MouseListener,KeyListener,Runnable{
 		if (e.getSource()==gui.nickconfirm) {
 			try {//取服务器公钥
 				pubkey=PostAndGet.getPubkey(gui.nick.getText(), mypubkey);
+				if (pubkey[0].equals(BigInteger.ZERO)) {//昵称存在则这样返回
+					gui.nick.setText("nick exists");
+					gui.nick.setEditable(true);
+					
+					} else {
+					originid=encryption.decode(pubkey[2]);//RSA解密得到的原始id
+					id=originid;
+					//锁定nick
+					gui.nick.setEditable(false);
+					gui.nickconfirm.setEnabled(false);
+					ready=true;
+					refresh.start();//开始接收消息
+					}
 			} catch (Exception e1) {
 				//PostAndGet报错
 				System.out.println("Error in confirm");
 				gui.nick.setText("Error");
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e2) {
-					System.out.println(
-							"unable to Thread.sleep when Error in confirm"
-							);
-				}
-				gui.nick.setText("");
 			}
-			if (pubkey[0].equals(BigInteger.ZERO)) {//昵称存在则这样返回
-				gui.nick.setText("nick exists");
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e1) {
-					System.out.println("unable to Thread.sleep when nick exists");
-				}
-				gui.nick.setText("");
-				gui.nick.setEditable(true);
 				
-			} else {
-				originid=encryption.decode(pubkey[2]);//RSA解密得到的原始id
-				id=originid;
-				//锁定nick
-				gui.nick.setEditable(false);
-				gui.nickconfirm.setEnabled(false);
-				ready=true;
-				refresh.start();//开始接收消息
-			}
 		} else if (ready) {//昵称是否已经选择
 			Object source=e.getSource();
 			//send被单击
@@ -290,12 +274,15 @@ public class Main implements MouseListener,KeyListener,Runnable{
 	}
 	@Override
 	public void keyPressed(KeyEvent e) {
-		
+		if(e.getKeyCode()==KeyEvent.VK_CONTROL)
+			ctrl=true;
+		if(e.getKeyCode()==KeyEvent.VK_ENTER && ctrl)
+			postText();
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if(e.getKeyCode()==KeyEvent.VK_ENTER)
-			postText();
+		if(e.getKeyCode()==KeyEvent.VK_CONTROL)
+			ctrl=false;
 	}
 
 }

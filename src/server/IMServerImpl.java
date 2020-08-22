@@ -1,4 +1,4 @@
-package test;
+package server;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -6,26 +6,28 @@ import java.util.HashMap;
 import javax.jws.*;
 import encryption.Encryption;
 import encryption.Transform;
+import message.Message;
 
-@WebService(endpointInterface="test.IMServer")
+@WebService(endpointInterface="server.IMServer")
 
 public class IMServerImpl implements IMServer{
 	private Encryption encryption;
 	private BigInteger[] pubkey=new BigInteger[2];
-	private ArrayList<Message> dialogs = new ArrayList<Message>(50);
+	public ArrayList<Message> dialogs = new ArrayList<Message>(50);
 	private HashMap<String,BigInteger[]> ids = new HashMap<String,BigInteger[]>(10,0.7F);
 	public IMServerImpl() {
 		encryption = new Encryption();
 		pubkey[0] = encryption.n;
 		pubkey[1] = encryption.e;
-		System.out.println("ready");
 	}
 	@Override
 	public boolean postMsg(Message msg) {
 		BigInteger[] id=ids.get(msg.nick);
 		if(encryption.decode(msg.mid).equals(id[1])) {
 			if(msg.type==1) {
-			msg=new Message(msg.nick,msg.mid,Transform.decryptText(msg.etext, id[1]));
+				msg=new Message(msg.nick,Transform.decryptText(msg.etext, id[1]));
+			} else if(msg.type==2) {
+				msg=new Message(msg.nick,msg.pic);
 			}
 			dialogs.add(msg);
 			

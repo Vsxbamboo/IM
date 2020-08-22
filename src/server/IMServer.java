@@ -1,9 +1,11 @@
-package test;
+package server;
 
 import java.math.BigInteger;
 import javax.jws.*;
 import javax.jws.soap.*;
 import javax.jws.soap.SOAPBinding.*;
+
+import message.Message;
 
 @WebService
 @SOAPBinding(style=Style.RPC)
