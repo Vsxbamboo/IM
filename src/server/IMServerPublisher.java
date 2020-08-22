@@ -9,7 +9,9 @@ public class IMServerPublisher {
 		IMServerImpl srsi=new IMServerImpl();
 		srsi.dialogs=BackupAndLoad.deser();
 		Endpoint.publish("http://127.0.0.1:5335/service",srsi);
-		System.out.println("ready");
+		System.out.println("The IMserver has already open in 127.0.0.1:5335");
+		System.out.println("type 'shutdown' to backup and exit.");
+		System.out.println("Directly exiting will lose your messages.");
 		Scanner sc=new Scanner(System.in);
 		if (sc.nextLine().equals("shutdown")) {
 			BackupAndLoad.enser(srsi.dialogs);
