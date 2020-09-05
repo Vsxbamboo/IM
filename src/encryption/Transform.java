@@ -1,27 +1,9 @@
 package encryption;
 
 import java.math.BigInteger;
-import java.awt.Image;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JWindow;;
 
 public class Transform {
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		BigInteger id=idRandom();
-		JWindow jw=new JWindow();
-		jw.setLocation(200,300);
-		jw.setSize(200,200);
-		ImageIcon icon=new ImageIcon("icon.png");
-		Image image=icon.getImage();
-		System.out.print(image.toString());
-		
-//		JLabel jl=new JLabel(icon);
-//		jw.add(jl);
-//		jw.setVisible(true);
-	}
+	//加密文本，文本变成byte数组，再加id乘id
 	public static BigInteger[] encryptText(String m,BigInteger id) {
 		byte[] mBytes=m.getBytes();
 		BigInteger[] mBigIntegers=new BigInteger[mBytes.length];
@@ -33,6 +15,8 @@ public class Transform {
 		}
 		return mBigIntegers;
 	}
+	
+	//解密文本，和加密操作相反
 	public static String decryptText(BigInteger[] mBigIntegers,BigInteger id) {
 		for (int i=0;i<mBigIntegers.length;i++) {
 			mBigIntegers[i]=mBigIntegers[i].divide(id).subtract(id);
@@ -44,11 +28,5 @@ public class Transform {
 		String re=new String(mBytes);
 		return re;
 	}
-	public static BigInteger idRandom() {
-		int bitid;
-		do {
-			bitid=(int)(Math.random()*1000);
-		} while (bitid<100);
-		return BigInteger.valueOf(bitid);
-	}
+	
 }

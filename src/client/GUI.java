@@ -25,14 +25,13 @@ public class GUI extends JFrame{
 	public JButton emoji=new JButton("emoji");
 	public JFileChooser chooser=new JFileChooser();//图片文件选择器
 	public JPanel sendPanel=new JPanel();  //发送面板或称右侧面板
-	public GUI() throws Exception {
+	public GUI() {
 		super("IM");
 		setLocation(200,200);
 		setSize(500,450);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLayout(new GridLayout(1,2));
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//关闭直接退出
+		setLayout(new GridLayout(1,2));//一行两列的网格布局
 		msgBox.setLayout(new BoxLayout(msgBox,BoxLayout.Y_AXIS));//消息竖直布局
-		msgBox.setAlignmentX(0);//TODO
 		leftPanel.setLayout(new BorderLayout());
 		leftPanel.add(mBS,BorderLayout.CENTER);
 		nickPanel.add(nicktip);
@@ -40,7 +39,7 @@ public class GUI extends JFrame{
 		nickPanel.add(nickconfirm);
 		leftPanel.add(nickPanel,BorderLayout.SOUTH);
 		add(leftPanel);
-		sendBox.setLineWrap(true);
+		sendBox.setLineWrap(true);//自动换行
 		sendBox.setEnabled(false);
 		sendPanel.add(sBS);
 		send.setEnabled(false);

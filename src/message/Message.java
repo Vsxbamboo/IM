@@ -2,7 +2,7 @@ package message;
 
 import java.awt.Image;
 import java.math.BigInteger;
-
+//消息对象，将消息所要的信息打包发送
 public class Message {
 	
 	public String nick ="";
@@ -31,9 +31,9 @@ public class Message {
 		this.etext=etext;
 	}
 	
-	public Message(String nick,BigInteger id,Image pic){
+	public Message(String nick,BigInteger mid,Image pic){
 		this.nick=nick;
-		this.mid=id;
+		this.mid=mid;
 		this.type=2;
 		this.pic=pic;
 	}

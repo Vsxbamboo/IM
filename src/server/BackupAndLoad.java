@@ -9,10 +9,11 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class BackupAndLoad {
-	
+	//存储消息的方法，序列化
 	public static void enser(ArrayList<Message> dialogs) {
+		//定义一个生消息的数组列表，生消息表示简化后的消息
 		ArrayList<RawMessage> dialogsser=new ArrayList<RawMessage>(dialogs.size());
-		for(Message msg:dialogs) {
+		for(Message msg:dialogs) {//用循环赋值dialogs给dialogsser
 			if(msg.type==1) {
 				dialogsser.add(new RawMessage(msg.nick,msg.text));
 			} else if(msg.type==2) {
@@ -31,10 +32,11 @@ public class BackupAndLoad {
 	    }
 		
 	}
+	//提取消息的方法，反序列化
 	@SuppressWarnings("unchecked")
 	public static ArrayList<Message> deser() {
 		File file=new File("dialogs.ser");
-		if (file.exists()) {
+		if (file.exists()) {//是否存在文件
 			ArrayList<RawMessage> dialogsser=null;
 			try{
 				FileInputStream fileIn=new FileInputStream("dialogs.ser");
@@ -48,7 +50,7 @@ public class BackupAndLoad {
 				System.out.println("unable to find RawMessage class");
 			}
 			ArrayList<Message> dialogs=new ArrayList<Message>(dialogsser.size());
-			for(RawMessage rmsg:dialogsser) {
+			for(RawMessage rmsg:dialogsser) {//转成Message
 				if(rmsg.type==1) {
 					dialogs.add(new Message(rmsg.nick,rmsg.text));
 				} else if(rmsg.type==2) {
